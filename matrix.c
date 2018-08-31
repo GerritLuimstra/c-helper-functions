@@ -3,6 +3,7 @@
     includes:
         - Matrix addition
         - Matrix subtraction
+        - Scalar support (add, sub, mult, div)
 */
 
 #include <stdio.h>
@@ -43,7 +44,7 @@ boolean m_same_dim (Matrix* A, Matrix* B){
 // Matrix addition (Add B to A)
 // NOTE: Matrices must have the same number of rows and columns
 // NOTE: Does not alter A or B
-Matrix* m_add( Matrix* A, Matrix* B ){
+Matrix* m_add( Matrix* A, Matrix* B ) {
 
     // Test whether the dimensions are the same
     if (!m_same_dim(A, B)) {
@@ -72,7 +73,7 @@ Matrix* m_add( Matrix* A, Matrix* B ){
 // Matrix addition (Subtract B from A)
 // NOTE: Matrices must have the same number of rows and columns
 // NOTE: Does not alter A or B
-Matrix* m_sub( Matrix* A, Matrix* B ){
+Matrix* m_sub( Matrix* A, Matrix* B ) {
 
     // Test whether the dimensions are the same
     if (!m_same_dim(A, B)) {
@@ -97,6 +98,45 @@ Matrix* m_sub( Matrix* A, Matrix* B ){
 
     return C;
 }
+
+// Scalar mutation function
+// NOTE: Does not alter the matrix
+Matrix* m_scalar_mut ( Matrix* m, double value, char type ) {
+    int rows = m->rows;
+    int cols = m->cols;
+
+    Matrix* n = m_init(rows, cols, 0.0);
+
+    for (int r = 0; r < rows; r++){
+        for (int c = 0; c < cols; c++) {
+            int curr = rows * r + c;
+            switch(type){
+                case '+':
+                    n->elements[curr] = m->elements[curr] + value;
+                    break;
+                case '-':
+                    n->elements[curr] = m->elements[curr] - value;
+                    break;
+                case '*':
+                    n->elements[curr] = m->elements[curr] * value;
+                    break;
+                case '/':
+                    n->elements[curr] = m->elements[curr] / value;
+                    break;
+                default:
+                    return NULL;
+            }
+        }
+    }
+
+    return n;
+}
+
+/* Scalar aliases for better usability */
+Matrix* m_scalar_add ( Matrix* m, double value ) { return m_scalar_mut(m, value, '+'); }
+Matrix* m_scalar_sub ( Matrix* m, double value ) { return m_scalar_mut(m, value, '-'); }
+Matrix* m_scalar_mult ( Matrix* m, double value ) { return m_scalar_mut(m, value, '*'); }
+Matrix* m_scalar_div ( Matrix* m, double value ) { return m_scalar_mut(m, value, '/'); }
 
 // Pretty prints the matrices
 void m_display ( Matrix* m ) {
@@ -145,6 +185,11 @@ int main(){
 
     // Simple Subtraction
     C = m_sub(A, B);
+    m_display(C);
+    m_destroy(C);
+
+    // Simple scalar multiplication
+    C = m_scalar_mult(A, 3);
     m_display(C);
     m_destroy(C);
 
